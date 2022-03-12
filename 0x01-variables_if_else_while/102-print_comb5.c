@@ -1,8 +1,7 @@
 #include <stdio.h>
 
 /**
- * main - main - two pairs of numbers that do not repeat
- *
+ * main - prints all possible combinations of two two-digit numbers.
  * Return: (0)
  */
 
@@ -17,7 +16,7 @@ int main(void)
 			if (i != j)
 			{
 				putchar(j / 10 + 48);
-				putchar(j % 10 + 48)
+				putchar(j % 10 + 48);
 				putchar(' ');
 				putchar(i / 10 + 48);
 				putchar(i % 10 + 48);
