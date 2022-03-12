@@ -24,7 +24,7 @@ int main(void)
 			}
 			if (j * 100 + i != 9899)
 			{
-				putchar(',');
+				putchar(' ');
 				putchar(' ');
 			}
 		}
