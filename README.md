@@ -1,1 +1,1 @@
-# 0x06. C - More pointers, arrays and strings
+# Alx-low_level_programming
