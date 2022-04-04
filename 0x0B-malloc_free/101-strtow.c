@@ -1,138 +1,86 @@
 #include "main.h"
-#include <stdio.h>
 #include <stdlib.h>
-
+#include <stdio.h>
 /**
- * _strcmp - Like strcmp.
- * @s1: string.
- * @s2: string.
- * Return: int.
+ * wordcounter - counts words and the letters in them
+ * @str: string to count
+ * @pos: position of the word to count characters from
+ * @firstchar: position of the first letter of the word
+ * if pos = 0, count the number of chars in the word
+ * else count number of words
+ * Return: wordcount if pos == 0,
+ * length of word if pos > 0,
+ * position of word if pos > 0 && firstchar > 0
  */
-int _strcmp(char *s1, char *s2)
+int wordcounter(char *str, int pos, char firstchar)
 {
-	int i = 0;
+	int i, wordcount, charcount, flag;
 
-
-	while (s1[i] != '\0' && s2[i] != '\0')
+	str[0] != ' ' ? (wordcount = 1) : (wordcount = 0);
+	for (i = 0, flag = 0; str[i]; i++)
 	{
-		if (s1[i] != s2[i])
+		if (str[i] == ' ' && str[i + 1] != ' ' && str[i + 1] != '\0' && flag == 0)
 		{
-			return (s1[i] - s2[i]);
-		}
-		i++;
-	}
-	return (0);
-}
-
-/**
-  * _strlen - Find the lenght of a string.
-  * @s: String.
-  * @i: Position.
-  * Return: The lenght, integer.
-  */
-int _strlen(char *s, int i)
-{
-	int count = 0;
-
-	while (s[i] != ' ' && s[i] != '\0')
-	{
-		count++;
-		i++;
-	}
-	return (count);
-}
-
-/**
- * words - Count the numbers of words.
- * @str: String.
- *
- * Return: Number of words.
- */
-int words(char *str)
-{
-	int count = 0, flag = 0;
-
-	while (*str)
-	{
-		if (*str != ' ')
-		{
+			wordcount++;
 			flag = 1;
 		}
-		else if (flag == 1)
+		if (pos > 0 && pos == wordcount)
 		{
-			count++;
-			flag = 0;
+			if (pos > 0 && pos == wordcount && firstchar > 0)
+				return (i);
+			for (charcount = 0; str[i + charcount + 1] != ' '; charcount++)
+				;
+			return (charcount);
 		}
-		str++;
+		if (str[i] == ' ')
+			flag = 0;
 	}
-	return (count);
+	return (wordcount);
 }
-
 /**
- * _strcpy - Copy elements from a string to another.
- * @s: String.
- * @i: Position.
- * @tmp: Array where it's saved.
- * Return: The array whit the elements.
- */
-char *_strcpy(char *s, int i, char *tmp)
-{
-	int j;
-
-	for (j = 0; s[i] != ' ' && s[i] != '\0'; i++, j++)
-	{
-		tmp[j] = s[i];
-	}
-	tmp[j] = '\0';
-
-	return (tmp);
-}
-
-/**
- * strtow - Extract all the words from an string.
- * @str: String.
- *
- * Return: Array of words.
+ * strtow - convert a string into a 2d array of words
+ * @str: string to convert
+ * Return: double pointer to 2d array
  */
 char **strtow(char *str)
 {
+	int wc, wordlen, getfirstchar, len, i, j;
+	char **p;
 
-	int i = 0, j = 0, pos, t;
-	char **tmp;
-
-	if (str == NULL || _strcmp(str, "") || (words(str) == 0))
-	{
+	for (len = 0; str[len]; len++)
+		;
+	if (str == NULL)
 		return (NULL);
-	}
-	tmp = malloc(sizeof(int *) * (words(str) + 1));
-	if (tmp == NULL)
-	{
+	wc = wordcounter(str, 0, 0);
+	if (len == 0 || wc == 0)
 		return (NULL);
-	}
-	while (str[i])
+	p = malloc((wc + 1) * sizeof(void *));
+	if (p == NULL)
+		return (NULL);
+	for (i = 0, wordlen = 0; i < wc; i++)
 	{
-		if (str[i] != ' ')
+		/* Allocate memory for nested elements */
+		wordlen = wordcounter(str, i + 1, 0);
+		if (i == 0 && str[i] != ' ')
+			wordlen++;
+		p[i] = malloc(wordlen * sizeof(char) + 1);
+		if (p[i] == NULL)
 		{
-			pos = _strlen(str, i);
-			tmp[j] = malloc(sizeof(char) * (pos + 1));
-			if (tmp[j] == NULL)
-			{
-				for (t = j; t >= 0; t--)
-				{
-					free(tmp[t]);
-				}
-				free(tmp);
-				return (NULL);
-			}
-			_strcpy(str, i, tmp[j]);
-			j++;
-			i += pos;
+			for ( ; i >= 0; --i)
+				free(p[i]);
+			free(p);
+			return (NULL);
 		}
-		else
-		{
-			i++;
-		}
+		/* initialize each element of the nested array with the word*/
+		getfirstchar = wordcounter(str, i + 1, 1);
+		if (str[0] != ' ' && i > 0)
+			getfirstchar++;
+		else if (str[0] == ' ')
+			getfirstchar++;
+		for (j = 0; j < wordlen; j++)
+			p[i][j] = str[getfirstchar + j];
+		p[i][j] = '\0';
 	}
-	tmp[j] = NULL;
-	return (tmp);
+	p[i] = NULL;
+	return (p);
 }
